@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using GradeBook.Enums;
 
 namespace GradeBook.GradeBooks
 {
@@ -16,9 +15,12 @@ namespace GradeBook.GradeBooks
         public List<Student> Students { get; set; }
 
         public GradeBookType Type { get; set; }
-        public BaseGradeBook(string name)
+
+        public bool IsWeighted { get; set; }
+        public BaseGradeBook(string name, bool isWeighted)
         {
             Name = name;
+            IsWeighted = isWeighted;
             Students = new List<Student>();
         }
 
@@ -108,20 +110,30 @@ namespace GradeBook.GradeBooks
 
         public virtual double GetGPA(char letterGrade, StudentType studentType)
         {
+            double assesedGPA = 0;
+
             switch (letterGrade)
             {
                 case 'A':
-                    return 4;
+                    assesedGPA = 4;
+                    break;
                 case 'B':
-                    return 3;
+                    assesedGPA = 3;
+                    break;
                 case 'C':
-                    return 2;
+                    assesedGPA = 2;
+                    break;
                 case 'D':
-                    return 1;
-                case 'F':
-                    return 0;
+                    assesedGPA = 1;
+                    break;                
             }
-            return 0;
+
+            if(IsWeighted && (studentType == StudentType.DualEnrolled || studentType == StudentType.Honors))
+            {
+                assesedGPA += 1;
+            }
+
+            return assesedGPA;
         }
 
         public virtual void CalculateStatistics()
